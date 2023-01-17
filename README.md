@@ -3,7 +3,7 @@ A simple real-time chat app built with React-native and Expo.
 
 Project page: https://expo.dev/@johnxxx/ChatApp?serviceType=classicdistribution=expo-go. 
 
-This app can run on the web and mobile devices(IOS & Android)
+This app can run on the web and mobile devices(iOS & Android)
 
 Running on iOS screenshot:   
 
