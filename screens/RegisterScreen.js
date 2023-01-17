@@ -1,7 +1,8 @@
 import React, { useLayoutEffect, useState }from 'react';
-import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text } from 'react-native';
 import { StatusBar } from "expo-status-bar";
-import { Button, Input, Text } from "react-native-elements";
+import { Avatar, Button, Input } from "react-native-elements";
+import { AntDesign } from "@expo/vector-icons";
 import { auth } from "../firebase";
 
 const RegisterScreen = ({ navigation }) => {
@@ -12,7 +13,27 @@ const RegisterScreen = ({ navigation }) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerBackTitle: "Back to Login",
+            headerBackTitle: "",
+            headerStyle: { backgroundColor: "#191970" },
+            headerLeft: () => (
+                <TouchableOpacity
+                    style={{ left: -4 }}
+                    onPress={navigation.goBack}
+                >
+                    <AntDesign name="caretleft" size={24} color="white" />
+                </TouchableOpacity>
+            ),
+            headerTitle: () => (
+                <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
+  
+                    <Text style={{ color: "white", fontWeight: "800", fontSize: 18}}>
+                        Register
+                    </Text>
+                </View>
+            )
         });
     }, [navigation]);
 
@@ -21,33 +42,41 @@ const RegisterScreen = ({ navigation }) => {
         .then((authUser) => {
             authUser.user.updateProfile({
                 displayName: name,
-                photoURL: imageUrl || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                photoURL: imageUrl || "https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/nesuuhyyzmjip7zg0kg4",
             })
-        })
-        .catch((error) => alert(error.message));
+        }).catch((error) => alert(error.message));
     }
 
     return (
+        <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
             <StatusBar style="light" />
-            <Text h3 style={{ marginBottom: 50 }}> 
-                Create a ChatApp Account
-            </Text>
+            <TouchableOpacity activeOpacity={0.5}>
+            <Avatar 
+                rounded 
+                size={130}
+                source={{ uri: "https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/nesuuhyyzmjip7zg0kg4"}}
+                containerStyle={{marginBottom: 30, alignSelf:"center"}}
+                avatarStyle={{}}
+            />
+            </TouchableOpacity>
             <View style={styles.inputContainer}>
                 <Input 
                     placeholder='User Name' 
-                    autoFocus 
+                    style={styles.textInput}
                     type='text' 
                     value={name}
                     onChangeText={text => setName(text)}
                 />
                 <Input 
+                    style={styles.textInput}
                     placeholder='Email' 
                     type='email' 
                     value={email}
                     onChangeText={text => setEmail(text)}
                 />
                 <Input 
+                    style={styles.textInput}
                     placeholder='Password' 
                     secureTextEntry
                     type='password' 
@@ -55,6 +84,7 @@ const RegisterScreen = ({ navigation }) => {
                     onChangeText={text => setPassword(text)}
                 />
                 <Input 
+                    style={styles.textInput}
                     placeholder='Profile Picture URL (optional)' 
                     type='text' 
                     value={imageUrl}
@@ -67,9 +97,10 @@ const RegisterScreen = ({ navigation }) => {
                 containerStyle={styles.button}
                 raised 
                 onPress={register} 
-                title="Register" 
+                title="Continue" 
             />
         </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -77,17 +108,27 @@ export default RegisterScreen;
 
 const styles = StyleSheet.create({
     button: {
-        width: 200,
-        marginTop: 10
+        width: 160,
+        marginBottom: 80,
     },
     container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 10,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        
     },
     inputContainer: {
-        width: 300,
-    }
+        width: 280,
+    },
+    textInput: {
+        flex: 1,
+        backgroundColor: "#fff",
+        color: "dimgrey",
+        borderRadius: 5,
+        fontSize: 16,
+        fontWeight: "700",
+        padding: 1,
+        paddingTop: 10
+    },
 });

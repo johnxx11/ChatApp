@@ -1,15 +1,23 @@
 import React, { useState, useLayoutEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Input} from "react-native-elements";
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, AntDesign } from '@expo/vector-icons';
 import { db } from '../firebase';
 
 const AddChatScreen = ({ navigation }) => {
     const [input, setInput] = useState("");
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: "Create Chat Room",
-            
+            title: "New Chat Rooms",
+            headerStyle: { backgroundColor: "#191970" },
+            headerLeft: () => (
+                <TouchableOpacity
+                    style={{ left: -4 }}
+                    onPress={navigation.goBack}
+                >
+                    <AntDesign name="caretleft" size={24} color="white" />
+                </TouchableOpacity>
+            ),
         });
     }, [navigation]);
 
@@ -29,16 +37,19 @@ const AddChatScreen = ({ navigation }) => {
                 onChangeText={(text) => setInput(text)}
                 onSubmitEditing={createChat}
                 leftIcon={
-                    <Entypo name="chat" size={24} color="#2C6BED" />
+                    <Entypo name="chat" size={30} color="grey" />
                 }
             />
-            <Button onPress={createChat} title='Create New Chat Room' />
+            <Button onPress={createChat} title='Create' disabled={!input || input.trim() === ""}/>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {},
+    container: {
+        width: "99%",
+        alignSelf: "center",
+    },
 });
 
 export default AddChatScreen;

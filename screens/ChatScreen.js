@@ -1,14 +1,25 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { KeyboardAvoidingView, SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Platform, Keyboard} from 'react-native';
+import { KeyboardAvoidingView, SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Platform, Keyboard, } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { TextInput, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { TextInput, ScrollView } from 'react-native';
 import firebase from "firebase/compat/app"
 import { db, auth } from '../firebase';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
+
+let timeNow = new Date();
+
+Date.prototype.getFullMinutes = function () {
+    if (this.getDate() < timeNow.getDate() || 
+        (this.getDate() >= timeNow.getDate() && this.getMonth() < timeNow.getMonth()) ||
+        (this.getDate() >= timeNow.getDate() && this.getMonth() >= timeNow.getMonth() && this.getFullYear() < timeNow.getFullYear())) {
+        return (this.getMonth() + 1) + "/" + this.getDate();
+    }
+    if (this.getMinutes() < 10) {
+        return this.getHours()+ ":0" + this.getMinutes();
+    }
+    return this.getHours() + ":" + this.getMinutes();
+ };
 
 const ChatScreen = ({ navigation, route }) => {
     const [input, setInput] = useState("");
@@ -18,30 +29,32 @@ const ChatScreen = ({ navigation, route }) => {
         navigation.setOptions({
             title: "Chat",
             headerBackTitleVisible: false,
+            headerStyle: { backgroundColor: "#191970" },
             headerTitleAlign: "left",
+
             headerTitle: () => (
                 <View style={{
                     flexDirection: "row",
                     alignItems: "center",
                 }}>
   
-                    <Text style={{ color: "white", fontWeight: "800" }}>
+                    <Text style={{ color: "white", fontWeight: "800", fontSize: 18}}>
                         {route.params.chatName}
                     </Text>
                 </View>
             ),
             headerLeft: () => (
                 <TouchableOpacity
-                    style={{ left: -4 }}
+                    style={{ left: -3 }}
                     onPress={navigation.goBack}
                 >
-                    <AntDesign name="arrowleft" size={24} color="white" />
+                    <AntDesign name="caretleft" size={24} color="white" />
                 </TouchableOpacity>
             ),
             headerRight: () => (
                 <View
                     style={{
-                        right: -4
+                        right: -3
                     }}
                 >
                     <TouchableOpacity>
@@ -90,25 +103,31 @@ const ChatScreen = ({ navigation, route }) => {
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.chatContainer}
-                keyboardVerticalOffset={90}
+                keyboardVerticalOffset={85}
             >
-               <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <>
-                    <ScrollView contentContainerStyle={{paddingTop: 15}}>
+                    <ScrollView
+                        contentContainerStyle={{paddingTop: 25}}>
                         {messages.map(({ id, data }) => 
                             data.email === auth.currentUser.email ? (
                                 <View key={id} style={styles.receiver}>
+                                    
                                     <Avatar
                                         position="absolute"
                                         containerStyle={{
                                             position:"absolute",
-                                            right:-45
+                                            right:-50,
                                         }}
-                                        right={-45} 
+                                        right={-50} 
                                         source={{uri:data.photoURL}} 
-                                        size={37}
+                                        size={42}
+                                        avatarStyle={{borderRadius: 5}}
                                     />
+                                    <AntDesign style={styles.chatIcon} name="caretright" size={8} />
                                     <Text style={styles.receiverText}>{data.message}</Text>
+                                    <Text style={styles.receiverTime}>
+                                        {(data.timestamp)? (data.timestamp.toDate().getFullMinutes()) : ("")}
+                                    </Text>
+                                    
                                 </View>
                             ) : (
                                 <View key={id} style={styles.sender}>
@@ -116,13 +135,20 @@ const ChatScreen = ({ navigation, route }) => {
                                         position="absolute"
                                         containerStyle={{
                                             position:"absolute",
-                                            left:-45
+                                            left:-50,            
                                         }}
-                                        left={-45} 
+                                        left={-50} 
                                         source={{uri:data.photoURL}} 
-                                        size={37}
+                                        size={42}
+                                        avatarStyle={{borderRadius: 5}}
                                     />
+                                    <AntDesign style={styles.chatIcon2} name="caretleft" size={8} color="black" />
+                                    <Text style={styles.senderName}>{data.displayName}</Text>
+                                    
                                     <Text style={styles.senderText}>{data.message}</Text>
+                                    <Text style={styles.senderTime}>
+                                        {(data.timestamp)? (data.timestamp.toDate().getFullMinutes()) : ("")}
+                                    </Text>
                                 </View>
                             )
                         )}
@@ -132,18 +158,19 @@ const ChatScreen = ({ navigation, route }) => {
                          value={input}
                          onChangeText={(text) => setInput(text)}
                          onSubmitEditing={sendMessage}
-                         placeholder="Messages" 
+                         placeholder="Let's chat!" 
                          style={styles.textInput}
                         />
                         <TouchableOpacity 
                             onPress={sendMessage} 
                             activeOpacity={0.5}
+                            disabled={!input || input.trim() === ""}
                         >
-                            <Ionicons name="send" size={24} color={"#2B68E6"} />
+                            <Ionicons 
+                                name="send" size={24} 
+                                color={(!input || input.trim() === "")? "grey" : "#191970"} />
                         </TouchableOpacity>
-                    </View>
-                </>
-                </TouchableWithoutFeedback>
+                    </View> 
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -161,7 +188,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         padding: 15,
-        width: "100%"
+        width: "99%"
     },
     textInput: {
         bottom: 0,
@@ -171,24 +198,26 @@ const styles = StyleSheet.create({
         backgroundColor: "#ECECEC",
         padding: 10,
         color: "black",
-        borderRadius: 30
+        borderRadius: 15,
+        fontSize: 15,
+        fontWeight: "600"
     },
     receiver: {
-        padding: 10,
-        backgroundColor: "#7BB32E",
+        padding: 5,
+        backgroundColor: "#7bb32e",
         alignSelf: "flex-end",
-        borderRadius: 10,
-        marginRight: 55,
-        marginBottom: 20,
+        borderRadius: 5,
+        marginRight: 60,
+        marginBottom: 16,
         maxWidth: "65%",
         position: "relative"
     },
     sender: {
-        padding: 10,
+        padding: 5,
         backgroundColor: "#ECECEC",
         alignSelf: "flex-start",
-        borderRadius: 10,
-        marginLeft: 55,
+        borderRadius: 5,
+        marginLeft: 60,
         marginBottom: 20,
         maxWidth: "65%",
         position: "relative"
@@ -196,11 +225,50 @@ const styles = StyleSheet.create({
     senderText: {
         color: "black",
         fontWeight: "600",
+        bottom: 8,
+        marginBottom: -3,
+        fontSize: 13
+        
+    },
+    senderName: {
+        fontWeight: "800",
+        fontSize: "14",
+        bottom: 9,
+        color: "#191970"
     },
     receiverText: {
         color: "black",
         fontWeight: "600",
+        bottom: 8,
+        marginBottom: -3,
+        fontSize: 13
     },
+    senderTime: {
+        color: "#696969",
+        fontWeight: "600",
+        fontSize: "10",
+        alignSelf: "flex-end",
+        bottom: -1,
+    },
+    receiverTime : {
+        color: "#696969",
+        fontWeight: "600",
+        fontSize: "10",
+        alignSelf: "flex-end",
+        bottom: -3
+    },
+    chatIcon: {
+        alignSelf: "flex-end",
+        left: 10,
+        bottom: -10,
+        color: "#7bb32e"
+    },
+    chatIcon2: {
+        alignSelf: "flex-start",
+        right: 10,
+        bottom: -12,
+        color: "#ECECEC"
+    }
 });
 
 export default ChatScreen;

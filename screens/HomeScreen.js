@@ -28,33 +28,42 @@ const HomeScreen = ({ navigation }) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             title: "",
-            headerStyle: { backgroundColor: "#2C6BED" },
+            headerStyle: { backgroundColor: "#191970" },
             headerTitleStyle: { color: "white" },
             headerTintColor: "white",
             headerBackVisible: false,
             
             headerLeft: () => (
                 <View style={{ 
-                    left: -2, 
+                    right: 3, 
                     bottom: 3,                    
                     flexDirection: "row",
                     width: 75,
                     justifyContent: "space-between", 
                 }}>
-                    <Avatar rounded source={{ uri: auth?.currentUser?.photoURL}}/>
+                    <TouchableOpacity activeOpacity={0.5}>
+                        <Avatar 
+                            rounded 
+                            size={35}
+                            source={{ uri: auth?.currentUser?.photoURL}}
+                            avatarStyle={{
+                                borderWidth: 2,
+                                borderColor: '#fff'}}
+                        />
+                    </TouchableOpacity>
                     <Text style={styles.userName}>{auth?.currentUser?.displayName}</Text>
                 </View>
             ),
             headerRight: () => (
                 <View style={{
-                    left: 5,
+                    left: 3,
                     bottom: 3,   
                     flexDirection: "row",
                     width: 70,
                     justifyContent: "space-between",
                     
                 }}>
-                    <TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.5}>
                         <Entypo onPress={() => navigation.navigate("AddChat")} name="new-message" size={24} color="#FFF" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
@@ -75,7 +84,7 @@ const HomeScreen = ({ navigation }) => {
     return (
       <SafeAreaView>
         <StatusBar style="light" />
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} >
             {chats.map(({id, data: { chatName }}) => (
                 <CustomListItem 
                     key={id} 
@@ -94,9 +103,15 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         height: '100%',
+        
     },
     userName: {
+        flexDirection: "row",
         color: "white",
         fontWeight: "600",
+        fontSize: 20,
+        alignSelf: "center",
+        marginStart: 10,
+        justifyContent: "center"
     }
 });
