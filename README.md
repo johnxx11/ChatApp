@@ -1,5 +1,5 @@
 # ChatApp
-A simple real-time chat app built with React-native and Exp0. 
+A simple real-time chat app built with React-native and Expo. 
 
 Project page: https://expo.dev/@johnxxx/ChatApp?serviceType=classicdistribution=expo-go. 
 
