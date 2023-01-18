@@ -22,7 +22,8 @@ https://github.com/johnxx11/ChatApp.git
 cd into the just created project and install dependencies with npm
 ```
 cd ChatApp
-
+```
 run the app:
 ```
 npm start
+```
